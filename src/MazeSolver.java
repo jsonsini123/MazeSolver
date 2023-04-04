@@ -1,10 +1,13 @@
 /**
  * Solves the given maze using DFS or BFS
- * @author Ms. Namasivayam
- * @version 03/10/2023
+ * @author Ms. Namasivayam, Jake Sonsini
+ * @version 04/3/2023
  */
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Stack;
+import java.util.Queue;
 
 public class MazeSolver {
     private Maze maze;
@@ -27,9 +30,23 @@ public class MazeSolver {
      * @return An arraylist of MazeCells to visit in order
      */
     public ArrayList<MazeCell> getSolution() {
-        // TODO: Get the solution from the maze
-        // Should be from start to end cells
-        return null;
+        // Create a stack to hold all of the solution values
+        Stack<MazeCell> sln = new Stack<>();
+        // Start the stack with the ending cell
+        sln.push(maze.getEndCell());
+        // While the top of the stack does not equal the beginning continue loop
+        while (!sln.peek().equals(maze.getStartCell())){
+            // Add the parent of the current cell
+            sln.push(sln.peek().getParent());
+
+        }
+        // Make an arraylist to hold final solution
+        ArrayList<MazeCell> complete = new ArrayList<>();
+        // Run a loop until complete is fully filled, this loop puts it in the correct order
+        while (sln.size() > 0){
+            complete.add(sln.pop());
+        }
+        return complete;
     }
 
     /**
@@ -37,9 +54,37 @@ public class MazeSolver {
      * @return An ArrayList of MazeCells in order from the start to end cell
      */
     public ArrayList<MazeCell> solveMazeDFS() {
-        // TODO: Use DFS to solve the maze
-        // Explore the cells in the order: NORTH, EAST, SOUTH, WEST
-        return null;
+        // Create the cells to visit stack and initialise current as the beginning cell
+        Stack<MazeCell> ctv = new Stack<>();
+        MazeCell current = maze.getStartCell();
+        // While the current cell does not equal the end, aka go till the maze is finished
+        while (!current.equals(maze.getEndCell())) {
+            // Run if statements that check cells in the N, E, S, W direction to see if they are valid to move forward
+            if (maze.isValidCell(current.getRow() - 1, current.getCol())) {
+                // Once a valid cell is detected add it to the cells to visit
+                ctv.push(maze.getCell(current.getRow() - 1, current.getCol()));
+                // Make the shifted cells parent equal to the current cell
+                maze.getCell(current.getRow() - 1, current.getCol()).setParent(current);
+            }
+            if (maze.isValidCell(current.getRow(), current.getCol() + 1)) {
+                ctv.push(maze.getCell(current.getRow(), current.getCol() + 1));
+                maze.getCell(current.getRow(), current.getCol() + 1).setParent(current);
+            }
+            if (maze.isValidCell(current.getRow() + 1, current.getCol())) {
+                ctv.push(maze.getCell(current.getRow() + 1, current.getCol()));
+                maze.getCell(current.getRow() + 1, current.getCol()).setParent(current);
+            }
+            if (maze.isValidCell(current.getRow(), current.getCol() - 1)) {
+                ctv.push(maze.getCell(current.getRow(), current.getCol() - 1));
+                maze.getCell(current.getRow(), current.getCol() - 1).setParent(current);
+            }
+            // After the if statements make sure current is explored
+            current.setExplored(true);
+            // Set current to the new cell
+            current = ctv.pop();
+        }
+        // Call get solution to put the solved maze into an ArrayList
+        return getSolution();
     }
 
     /**
@@ -47,9 +92,38 @@ public class MazeSolver {
      * @return An ArrayList of MazeCells in order from the start to end cell
      */
     public ArrayList<MazeCell> solveMazeBFS() {
-        // TODO: Use BFS to solve the maze
-        // Explore the cells in the order: NORTH, EAST, SOUTH, WEST
-        return null;
+        // Create the cells to visit queue variable which changes the search pattern to BFS
+        Queue<MazeCell> ctv = new LinkedList<>();
+        // Sets current cell
+        MazeCell current = maze.getStartCell();
+        // Run loop until maze is solved which is when current is at the end cell
+        while (!current.equals(maze.getEndCell())){
+            // Explore using if statements in the N, E, S, W direction
+            if (maze.isValidCell(current.getRow() - 1, current.getCol())){
+                // Add the current cell that is shifted to cells to visit
+                ctv.add(maze.getCell(current.getRow() - 1, current.getCol()));
+                // Set the parent of the new cell to the current cell
+                maze.getCell(current.getRow() - 1, current.getCol()).setParent(current);
+            }
+            if (maze.isValidCell(current.getRow(), current.getCol() + 1)){
+                ctv.add(maze.getCell(current.getRow(), current.getCol() + 1));
+                maze.getCell(current.getRow(), current.getCol() + 1).setParent(current);
+            }
+            if (maze.isValidCell(current.getRow() - 1, current.getCol())){
+                ctv.add(maze.getCell(current.getRow() - 1, current.getCol()));
+                maze.getCell(current.getRow() - 1, current.getCol()).setParent(current);
+            }
+            if (maze.isValidCell(current.getRow(), current.getCol() - 1)){
+                ctv.add(maze.getCell(current.getRow(), current.getCol() - 1));
+                maze.getCell(current.getRow(), current.getCol() - 1).setParent(current);
+            }
+            // Make the current cell explored
+            current.setExplored(true);
+            // Change the current cell to the shifted cell
+            current = ctv.remove();
+        }
+        // Call get solution to put the solved maze into an ArrayList
+        return getSolution();
     }
 
     public static void main(String[] args) {

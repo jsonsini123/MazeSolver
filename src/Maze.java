@@ -1,7 +1,7 @@
 /**
  * Creates a Maze made up of MazeCells
- * @author Ms. Namasivayam
- * @version 03/04/2022
+ * @author Ms. Namasivayam, Jake Sonsini
+ * @version 04/03/2022
  */
 
 import java.io.File;
@@ -146,7 +146,14 @@ public class Maze {
      * @return boolean true/false
      */
     public boolean isValidCell(int row, int col) {
-        // TODO: Complete this function
+        // Check whether the cell entered in stays within the maze dimensions
+        if (row >= numRows || col >= numCols || row < 0 || col < 0){
+            return false;
+        }
+        // Check if the current cell is either a wall or has been explored
+        if (getCell(row, col).isWall() || getCell(row, col).isExplored()){
+            return false;
+        }
         return true;
     }
 }
